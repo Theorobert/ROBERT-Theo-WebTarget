@@ -1,0 +1,96 @@
+import tkinter as tk
+from tkinter import font
+from bs4 import BeautifulSoup
+import requests
+from Mail import Mail
+import re
+from tkinter.messagebox import *
+
+class ListeMail(tk.Tk):
+    def __init__(self, campagne):
+        super().__init__()
+        self.title_font = font.Font(family='Helvetica', size=28)
+        self.name_font = font.Font(family='Helvetica', size=15)
+
+        self.geometry("600x700")
+
+        self.title_label = tk.Label(self, text="Fonction", font=self.title_font)
+
+        self.button = tk.Button(self, text="Dédoubloner", font=self.name_font, command=lambda: self.Dedoublonner())
+        self.button2 = tk.Button(self, text="Vérification", font=self.name_font, command=lambda: self.Verif())
+        self.import_csv_button = tk.Button(self, text="Importer depuis le CSV", font=self.name_font, command=lambda: self.csvWriteListBox(campagne))
+        self.button4 = tk.Button(self, text="Importer depuis un URL", font=self.name_font, command=lambda: self.urlWriteListBox())
+        self.launch_button = tk.Button(self, text="Suite", font=self.name_font, command=lambda: self.goToMail())
+
+        self.mail_list = tk.Listbox(self, width=75, height=25)
+
+        self.title_label.place(x=250, y=50)
+        self.button.place(x=50, y=100)
+        self.button2.place(x=180, y=100)
+        self.import_csv_button.place(x=50, y=150)
+        self.button4.place(x=250, y=150)
+        self.mail_list.place(x=50, y=200)
+        self.launch_button.place(x=50, y=650)
+        self.init_list(campagne)
+
+    def csvWriteListBox(self, campagne):
+        i = 0
+        for line in csvFileReader(campagne):
+            self.mail_list.insert(i + 1, line)
+
+    def init_list(self, campagne):
+        self.csvWriteListBox(campagne)
+
+    def urlWriteListBox(self):
+        i = 0
+        for line in getLinks("http://univcergy.phpnet.org/python/mail.html"):
+            self.mail_list.insert(i + 1, line)
+
+    def Dedoublonner(self):
+        checked_list = list(dict.fromkeys(self.mail_list.get(0, tk.END)))
+        self.mail_list.delete(0, tk.END)
+        i = 0
+        for line in checked_list:
+            self.mail_list.insert(i + 1, line)
+
+    def Verif(self):
+        error_count = 0
+        checked_list = list(dict.fromkeys(self.mail_list.get(0, tk.END)))
+        for line in checked_list:
+            if not re.match("[^@]+@[^@]+\.[^@]+", line):
+                error_count += 1
+        if error_count !=0:
+            showerror("Erreur", "La liste contient une ou plusieurs adresse mail éroné(s)")
+        else:
+            showinfo("Validation", "Les mails ont été validés.")
+
+    def goToMail(self):
+        m = Mail()
+        self.destroy()
+        m.mainloop()
+
+
+def csvFileReader(file_name):
+    tmp = []
+    file = open(file_name, "r")
+    for line in file.readlines():
+        tmp.append(line.replace("\n", ""))
+    file.close()
+    return tmp
+
+def getLinks(url):
+    page = requests.get(url)
+    data = page.text
+    soup = BeautifulSoup(data, features="html.parser")
+
+    links = []
+    for link in soup.find_all('a'):
+        if "mailto:" in link.get('href'):
+            links.append(link.get('href').split("mailto:")[1])
+
+    return links
+
+
+
+
+
