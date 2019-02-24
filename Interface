@@ -1,0 +1,52 @@
+import tkinter as tk
+
+def principalwindow(fenetre):
+    newfen = Tk()
+    label = Label(newfen, text="")
+    label.pack()
+    fenetre.destroy()
+
+    Frame1 = Frame(newfen, borderwidth=5)
+    Frame1.pack(side=RIGHT, padx=30, pady=30)
+    boutonD = Button(Frame1, text='Dédoublon')
+    boutonD.pack()
+
+    Frame2 = Frame(newfen, borderwidth=5)
+    Frame2.pack(side=RIGHT, padx=50, pady=50)
+    boutonV = Button(Frame2, text='Vérification')
+    boutonV.pack()
+
+    Frame3 = Frame(newfen, borderwidth=5)
+    Frame3.pack(side=RIGHT, padx=50, pady=50)
+    boutonI = Button(Frame3, text='Importer depuis un CSV')
+    boutonI.pack()
+
+    Frame4 = Frame(newfen, borderwidth=5)
+    Frame4.pack(side=RIGHT, padx=50, pady=50)
+    boutonIU = Button(Frame4, text='Importer depuis un URL')
+    boutonIU.pack()
+
+def dedoublonwindow(principalwindows):
+    newfen = Tk()
+    label = Label(newfen, text="")
+    label.pack()
+    principalwindow.destroy()
+    Frame1 = Frame(newfen, borderwidth=5)
+    Frame1.pack(side=LEFT, padx=30, pady=30)
+
+febase = Tk()
+
+label = Label(febase, text="NomCampagne")
+label.pack()
+Frame1 = Frame(febase, borderwidth=5)
+Frame1.pack(side=LEFT, padx=30, pady=30)
+Label(Frame1, text="Tapez un nom de fichier csv à analyser :").pack(padx=10, pady=10)
+f = StringVar()
+entree1 = Entry(Frame1, textvariable=f, width=7)
+entree1.get()
+entree1.pack()
+bouton = Button(Frame1, text='OK', command=lambda: principalwindow(febase))
+bouton.pack()
+
+febase.mainloop()
+
